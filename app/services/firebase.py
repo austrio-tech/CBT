@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import json
 import logging
 import os
@@ -23,9 +24,14 @@ def init_firebase(service_account_path: str) -> None:
     global _db
     json_str = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
     if json_str:
-        service_account_info = json.loads(json_str)
-        # Render (and many env var UIs) store \n as a literal two-char sequence.
-        # The PEM private key needs actual newline characters or it won't parse.
+        raw = json_str.strip()
+        # Accept either base64-encoded JSON (recommended for Render) or raw JSON.
+        # Base64 avoids all special-character and newline corruption issues.
+        if not raw.startswith("{"):
+            raw = base64.b64decode(raw).decode("utf-8")
+        service_account_info = json.loads(raw)
+        # Normalise any escaped \n sequences in the private key that may survive
+        # even after base64 decoding (belt-and-suspenders).
         if "private_key" in service_account_info:
             service_account_info["private_key"] = service_account_info["private_key"].replace("\\n", "\n")
         cred = credentials.Certificate(service_account_info)
