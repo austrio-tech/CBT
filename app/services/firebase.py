@@ -23,7 +23,12 @@ def init_firebase(service_account_path: str) -> None:
     global _db
     json_str = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
     if json_str:
-        cred = credentials.Certificate(json.loads(json_str))
+        service_account_info = json.loads(json_str)
+        # Render (and many env var UIs) store \n as a literal two-char sequence.
+        # The PEM private key needs actual newline characters or it won't parse.
+        if "private_key" in service_account_info:
+            service_account_info["private_key"] = service_account_info["private_key"].replace("\\n", "\n")
+        cred = credentials.Certificate(service_account_info)
         logger.info("Firebase: loading credentials from FIREBASE_SERVICE_ACCOUNT_JSON env var")
     elif os.path.exists(service_account_path):
         cred = credentials.Certificate(service_account_path)
