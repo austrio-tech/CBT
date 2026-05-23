@@ -25,9 +25,16 @@ def init_firebase(service_account_path: str) -> None:
     if json_str:
         cred = credentials.Certificate(json.loads(json_str))
         logger.info("Firebase: loading credentials from FIREBASE_SERVICE_ACCOUNT_JSON env var")
-    else:
+    elif os.path.exists(service_account_path):
         cred = credentials.Certificate(service_account_path)
         logger.info(f"Firebase: loading credentials from file '{service_account_path}'")
+    else:
+        raise RuntimeError(
+            "Firebase credentials not found. "
+            "On Render/cloud: set the FIREBASE_SERVICE_ACCOUNT_JSON environment variable "
+            "to the full contents of your service account JSON. "
+            "Locally: place service-account.json in the project root."
+        )
     firebase_admin.initialize_app(cred)
     _db = firestore.client()
     logger.info("Firebase Admin SDK initialized")
