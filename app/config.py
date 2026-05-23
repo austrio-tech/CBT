@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     conversation_max_turns: int = 3
     kb_folder: str = "KB"
     allowed_origins: str = "*"
+    firebase_service_account: str = "service-account.json"
 
     @property
     def models_list(self) -> list[str]:

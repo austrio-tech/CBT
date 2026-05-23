@@ -7,7 +7,7 @@ from starlette.responses import Response
 
 from app.config import settings
 from app.routers import chat
-from app.services import knowledge
+from app.services import firebase, knowledge
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -17,13 +17,14 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     knowledge.load_knowledge_base(settings.kb_folder)
     logger.info(f"Knowledge base ready — {len(knowledge._sections)} sections loaded from '{settings.kb_folder}/'")
+    firebase.init_firebase(settings.firebase_service_account)
     yield
 
 
 app = FastAPI(
     title="Travel KSA Chatbot API",
-    description="AI travel guide chatbot for Saudi Arabia with Firestore data support.",
-    version="1.0.0",
+    description="AI travel guide chatbot for Saudi Arabia with direct Firestore access.",
+    version="2.0.0",
     lifespan=lifespan,
 )
 

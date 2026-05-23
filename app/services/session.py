@@ -4,58 +4,6 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 
-# ---------------------------------------------------------------------------
-# Pending data-request sessions (ref_code → question context)
-# ---------------------------------------------------------------------------
-
-@dataclass
-class PendingSession:
-    question: str
-    conversation_history: list[dict]
-    data_request: dict
-    conversation_id: str
-    expires_at: datetime
-
-
-_pending: dict[str, PendingSession] = {}
-
-
-def create_session(
-    question: str,
-    history: list[dict],
-    data_request: dict,
-    conversation_id: str,
-    ttl_minutes: int = 30,
-) -> str:
-    ref_code = str(uuid.uuid4())
-    _pending[ref_code] = PendingSession(
-        question=question,
-        conversation_history=history,
-        data_request=data_request,
-        conversation_id=conversation_id,
-        expires_at=datetime.utcnow() + timedelta(minutes=ttl_minutes),
-    )
-    return ref_code
-
-
-def get_session(ref_code: str) -> Optional[PendingSession]:
-    s = _pending.get(ref_code)
-    if s is None:
-        return None
-    if datetime.utcnow() > s.expires_at:
-        del _pending[ref_code]
-        return None
-    return s
-
-
-def delete_session(ref_code: str) -> None:
-    _pending.pop(ref_code, None)
-
-
-# ---------------------------------------------------------------------------
-# Conversation history (session_id → rolling Q&A context)
-# ---------------------------------------------------------------------------
-
 @dataclass
 class Conversation:
     history: list[dict] = field(default_factory=list)

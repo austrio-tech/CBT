@@ -1,6 +1,6 @@
 # Credentials & Configuration — Travel KSA
 
-> ⚠️ This file contains sensitive configuration. Keep it private and do not commit to public repositories.
+> ⚠️ All credentials have been moved to `.env`. See `.env.example` for the list of required variables.
 
 ---
 
@@ -22,12 +22,12 @@ The admin account has no Firebase Auth entry. Credentials are hardcoded in `Admi
 | Field | Value |
 |---|---|
 | Project name | `travel-ksa-meta` |
-| Project ID | `travel-ksa-meta` |
-| Project number | `990685645822` |
-| Firebase App ID (Android) | `1:990685645822:android:632f11bcfcf171ab130eaf` |
+| Project ID | see `.env` → `FIREBASE_PROJECT_ID` |
+| Project number | see `.env` → `FIREBASE_PROJECT_NUMBER` |
+| Firebase App ID (Android) | see `.env` → `FIREBASE_APP_ID` |
 | Android package | `com.example.travelaks` |
-| Web API Key | `AIzaSyB_VWvxChPfcz4DAY-TAL7Ocj7jKDj5OVs` |
-| Firestore region | `europe-west1` |
+| Web API Key | see `.env` → `FIREBASE_WEB_API_KEY` |
+| Firestore region | see `.env` → `FIREBASE_REGION` |
 | Config file | `app/google-services.json` |
 
 ---
