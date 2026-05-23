@@ -1,5 +1,7 @@
 import asyncio
+import json
 import logging
+import os
 from typing import Any
 
 import firebase_admin
@@ -11,8 +13,21 @@ _db = None
 
 
 def init_firebase(service_account_path: str) -> None:
+    """Initialize Firebase Admin SDK.
+
+    On cloud deployments (e.g. Render) where file upload is not possible,
+    set the FIREBASE_SERVICE_ACCOUNT_JSON env var to the full JSON content
+    of the service account key. Locally, place the JSON file at
+    service_account_path and leave FIREBASE_SERVICE_ACCOUNT_JSON unset.
+    """
     global _db
-    cred = credentials.Certificate(service_account_path)
+    json_str = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+    if json_str:
+        cred = credentials.Certificate(json.loads(json_str))
+        logger.info("Firebase: loading credentials from FIREBASE_SERVICE_ACCOUNT_JSON env var")
+    else:
+        cred = credentials.Certificate(service_account_path)
+        logger.info(f"Firebase: loading credentials from file '{service_account_path}'")
     firebase_admin.initialize_app(cred)
     _db = firestore.client()
     logger.info("Firebase Admin SDK initialized")
